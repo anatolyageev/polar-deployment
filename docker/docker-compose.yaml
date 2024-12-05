@@ -1,0 +1,26 @@
+version: "3.8"  # The Docker Compose syntax version
+services: # The section containing all the containers to run
+  catalog-service:  # The section describing the catalog-service container
+    depends_on:
+      - polar-postgres  # Catalog Service should start after the PostgreSQL database.
+    image: "catalog-service"  # The image used to run the container
+    container_name: "catalog-service" # The name of the container
+    ports:  # The section listing the port mappings
+      - 9001:9001
+      - 8001:8001  # The port where the JVM will listen for debug connections
+    environment:  # The section listing the environment variables
+      - BPL_JVM_THREAD_COUNT=50 # A Paketo Buildpacks environment variable to configure the number of threads  for memory calculation
+      - BPL_DEBUG_ENABLED=true # Activates the JVM configuration for accepting debug connections (provided by Buildpacks)
+      - BPL_DEBUG_PORT=8001 # Debug connections are accepted via a socket on port 8001 (provided by Buildpacks).
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://polar-postgres:5432/polardb_catalog
+      - SPRING_PROFILES_ACTIVE=testdata #  Enables the “testdata” Spring profile
+
+  polar-postgres:   # The section describing the polar-postgres container
+    image: "postgres:14.4"
+    container_name: "polar-postgres"
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=polardb_catalog
