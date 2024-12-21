@@ -23,4 +23,6 @@ services: # The section containing all the containers to run
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=polardb_catalog
+#      - POSTGRES_DB=polardb_catalog  # remove the value for the POSTGRES_DB environment variable, since we’ll now delegate the database creation to the script
+    volumes:   # Mounts the initialization SQL script to the container as a volume
+      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
